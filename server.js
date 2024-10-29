@@ -1,30 +1,64 @@
-const express = require("express");  // Import the Express module, a web framework for building server-side applications in Node.js
-const http = require("http");  // Import the HTTP module to create an HTTP server
-const socketIO = require("socket.io");  // Import the Socket.IO module, which allows real-time communication between the server and clients
+//------------Initialize the express 'app' object--------
+let express = require("express");
+// const express = require("express");  
+let app = express();
+// const app = express();  
 
-const app = express();  // Create an instance of an Express application
-const server = http.createServer(app);  // Create an HTTP server that uses the Express app to handle requests
-const io = socketIO(server);  // Initialize a new instance of Socket.IO and bind it to the HTTP server for real-time communication
+//----------Initialize HTTP server------
+let http = require("http");
+// const http = require("http");  
+let server = http.createServer(app);
+// const server = http.createServer(app); 
 
-app.use(express.static("public"));  // Serve static files (HTML, CSS, JS, etc.) from the "public" folder
+//------------Initialize socket.io---------
+let io = require("socket.io");
+io = new io.Server(server);
+// const socketIO = require("socket.io");  
+// const io = socketIO(server);  
+
+
+// ------Set the server to listen on port 3000 -------
+let port = process.env.PORT || 3000;  
+server.listen(port, () => {  
+    console.log(`Server is running on port ${port}`);  
+});
+
+
+let piecePositions = {};
+
+app.use("/", express.static("public"));
+// app.use(express.static("public"));  
 
 // Handle a new connection event
 io.on("connection", (socket) => {  // Listen for clients connecting to the Socket.IO server
-    console.log("A user connected");  // Log when a user successfully connects to the server
+    console.log("A user connected:" + socket.id);  // Log when a user successfully connects to the server
+    
+    //send the current state to the new user
+    socket.emit('initialize-pieces',piecePositions);
 
-    // Listen for 'move-piece' events from the client
-    socket.on("move-piece", (data) => {  // When a "move-piece" event is received from the client, handle it
-        socket.broadcast.emit("move-piece", data);  // Broadcast the piece's movement data to all other connected clients, except the sender
+    //----new version testing
+    //set up initializing pieces for everyone
+    socket.on('initialize-pieces', (positions) => {
+        piecePositions = positions;
+        io.emit('initialize-pieces', positions);
     });
 
-    // Handle a disconnection event
+   //listen for message from client
+    socket.on('move-piece', (data) => {
+        piecePositions[data.id] = { x: data.x, y: data.y};
+        //Send data to ALL clients, including this one
+        io.emit('move-piece',data);
+        
+
+    // ---------old version-------
+    // // Listen for 'move-piece' events from the client
+    // socket.on("move-piece", (data) => {  // When a "move-piece" event is received from the client, handle it
+    //     socket.broadcast.emit("move-piece", data);  // Broadcast the piece's movement data to all other connected clients, except the sender
+    // });
+    });
+
+// Handle a disconnection event
     socket.on("disconnect", () => {  // Listen for the disconnection event when a user disconnects from the server
-        console.log("A user disconnected");  // Log when a user disconnects from the server
+        console.log("A user disconnected"+ socket.id);  // Log when a user disconnects from the server
     });
-});
-
-// Set the server to listen on port 3000 or an environment-specified port
-const PORT = process.env.PORT || 3000;  // Define the port the server will listen on, either from the environment variable or default to 3000
-server.listen(PORT, () => {  // Start the server and have it listen for incoming connections on the defined port
-    console.log(`Server is running on port ${PORT}`);  // Log that the server is running and the port it is using
 });

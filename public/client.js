@@ -1,9 +1,72 @@
-const socket = io();  // Connect to the server using Socket.IO, enabling real-time communication between the client and server
+let socket = io();  // Connect to the server using Socket.IO, enabling real-time communication between the client and server
 
 const pieces = document.querySelectorAll(".puzzle-piece");  // Select all elements with the class "puzzle-piece" and store them in the 'pieces' variable
 
+
+function addDragFunctionality(piece){
+    let isDragging = false; // To track if the piece is currently being dragged
+    let offsetX, offsetY; // To store the offset of the mouse position relative to the piece
+
+    // Mouse down event: Start dragging
+    piece.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // Prevent default behavior
+        isDragging = true;
+
+        // Calculate the offset of the mouse position relative to the piece
+        offsetX = e.clientX - piece.getBoundingClientRect().left;
+        offsetY = e.clientY - piece.getBoundingClientRect().top;
+
+        // Set cursor to indicate dragging
+        piece.style.cursor = 'grabbing';
+
+        // Bring the piece to the front
+        piece.style.zIndex = 1000;
+
+        // Add a mousemove event listener to the document
+        document.addEventListener("mousemove", movePiece);
+    });
+
+    // Move the piece function
+    const movePiece = (e) => {
+        if (isDragging) {
+            // Calculate the new position of the piece
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+
+            // Set the piece's position to the new coordinates
+            piece.style.position = "absolute";
+            piece.style.left = `${x}px`;
+            piece.style.top = `${y}px`;
+            socket.emit("move-piece", { id: piece.id, x, y});
+        }
+    };
+
+    // Mouse up event: Stop dragging
+    document.addEventListener("mouseup", () => {
+        if (isDragging) {
+            isDragging = false;
+
+            // Reset the cursor
+            piece.style.cursor = 'grab';
+
+            // // Get the final position of the piece
+            // const x = parseInt(piece.style.left, 10);
+            // const y = parseInt(piece.style.top, 10);
+
+            // // Emit the move event to the server with the piece's ID and new coordinates (x, y)
+            // socket.emit("move-piece", { id: piece.id, x, y });
+
+            // Remove the mousemove event listener to stop dragging
+            document.removeEventListener("mousemove", movePiece);
+        }
+    });
+};
+
+
+
 // New function added to randomize the position of each puzzle piece
-function randomizePositions() {
+function setup() {
+    const positions = [];
     pieces.forEach(piece => {
         // Get the width and height of the browser window
         const windowWidth = window.innerWidth;
@@ -17,38 +80,52 @@ function randomizePositions() {
         piece.style.position = "absolute";
         piece.style.left = `${randomX}px`;
         piece.style.top = `${randomY}px`;
+
+        positions.push({ id: piece.id, x: randomX, y: randomY});
     });
+    socket.emit('initialize-pieces',positions);
 }
 
-// Call the randomization function to place puzzle pieces at random locations when the page loads
-randomizePositions();  // This line is new
+//Only run setup if it is the first load
+if (!sessionStorage.getItem('hasLoaded')){
+    setup();
+    sessionStorage.setItem('hasLoaded','true');
+}
 
-pieces.forEach(piece => {  // Loop through each puzzle piece
-    piece.addEventListener("dragstart", (e) => {  // Add an event listener for the "dragstart" event to each piece, triggered when the piece starts being dragged
-        e.dataTransfer.setData("text", e.target.id);  // Set the data being transferred during the drag operation as the piece's ID
-    });
-
-    piece.addEventListener("dragend", (e) => {  // Add an event listener for the "dragend" event, triggered when the piece is dropped
-        // Get the position where the piece was dropped, adjusting the coordinates so the piece centers at the drop point
-        const x = e.clientX - piece.clientWidth / 2;
-        const y = e.clientY - piece.clientHeight / 2;
-
-        // Move the piece visually to the new position by setting its CSS 'position' property to 'absolute'
-        piece.style.position = "absolute";  
-        piece.style.left = `${x}px`;  // Set the horizontal position of the piece to the calculated x-coordinate
-        piece.style.top = `${y}px`;   // Set the vertical position of the piece to the calculated y-coordinate
-
-        // Emit the move event to the server with the piece's ID and new coordinates (x, y)
-        socket.emit("move-piece", { id: piece.id, x, y });
-    });
+socket.on('initialize-pieces', (positions)=>{
+    for (let id in positions){
+        const piece =document.getElementById(id);
+        if(piece){
+            piece.style.position = "absolute"; 
+            piece.style.left = `${positions[id].x}px`; 
+            piece.style.top = `${positions[id].y}px`;
+        }
+    }
 });
 
-// Listen for move events from other clients
-socket.on("move-piece", (data) => {  // Listen for the "move-piece" event emitted by the server, which contains the updated piece position data
-    const piece = document.getElementById(data.id);  // Find the puzzle piece by its ID from the data received
-    if (piece) {  // If the piece exists in the document
-        piece.style.position = "absolute";  // Ensure the piece is positioned absolutely
-        piece.style.left = `${data.x}px`;   // Update the piece's horizontal position to the new x-coordinate
-        piece.style.top = `${data.y}px`;    // Update the piece's vertical position to the new y-coordinate
+
+
+socket.on("move-piece", (data) => {
+    const piece = document.getElementById(data.id);
+    if (piece) {
+        piece.style.position = "absolute";
+        piece.style.left = `${data.x}px`;
+        piece.style.top = `${data.y}px`;
     }
+});
+
+// Call the function for each piece 
+pieces.forEach(piece => addDragFunctionality(piece));
+
+//Listen for confirmation of connection
+socket.on('connect', () => {
+    console.log("Connected");
+});
+
+
+//Listen for an event named 'message-share' from the server
+socket.on('message-share', (data) => {
+    console.log(data);
+    addDragFunctionality(document.getElementById(data.id));
+
 });
