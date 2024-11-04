@@ -57,6 +57,36 @@ io.on("connection", (socket) => {  // Listen for clients connecting to the Socke
     // });
     });
 
+
+    let gameStarted = false;
+let timer = 10; // 初始计时设为 10 秒
+
+// 处理客户端的 'start-game' 请求
+io.on("connection", (socket) => {
+    socket.on("start-game", () => {
+        if (!gameStarted) { // 确保只启动一次
+            gameStarted = true;
+            io.emit("game-started"); // 通知所有客户端游戏开始
+            startTimer(); // 启动计时
+        }
+    });
+});
+
+function startTimer() {
+    const interval = setInterval(() => {
+        timer -= 1;
+        io.emit("timer-update", timer); // 广播倒计时给所有客户端
+
+        if (timer <= 0) {
+            clearInterval(interval);
+            gameStarted = false;
+            timer = 10; // 重置计时器
+            io.emit("game-ended"); // 广播游戏结束
+        }
+    }, 1000);
+}
+
+
 // Handle a disconnection event
     socket.on("disconnect", () => {  // Listen for the disconnection event when a user disconnects from the server
         console.log("A user disconnected"+ socket.id);  // Log when a user disconnects from the server

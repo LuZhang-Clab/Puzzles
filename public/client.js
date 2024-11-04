@@ -3,12 +3,94 @@ let socket = io();  // Connect to the server using Socket.IO, enabling real-time
 const pieces = document.querySelectorAll(".puzzle-piece");  // Select all elements with the class "puzzle-piece" and store them in the 'pieces' variable
 let maxZIndex = 1000;  // Initialize maxZIndex to track the highest z-index used
 
+let previousPieceId = null; //save previous piece
+
+let gameStarted =false;
+
+function startGame(){
+    socket.emit("start-game");
+    // gameStarted =true;
+    document.getElementById('gameStartButton').disabled =true;//让gamestart按钮失效
+    // startTimer();//计时器功能开启
+
+}
+
+// 监听服务器的游戏开始事件
+socket.on("game-started",()=>{
+    gameStarted=true;
+    startTimerUI();// 启动客户端的计时显示
+})
+
+// 监听倒计时更新事件
+Socket.on("timer-update",(timeLeft)=>{
+    document.getElementById("timer").innerText = `Time left: ${timeLeft} seconds`;
+
+})
+
+// 监听游戏结束事件
+socket.on("game-ended", () => {
+    gameStarted = false;
+    pieces.forEach(piece => {
+        piece.style.pointerEvents = "none"; // 禁用所有图层的拖动功能
+    });
+    alert("Game Over!");
+});
+
+// 添加计时显示的 UI
+// 添加计时显示的 UI
+function startTimerUI() {
+    let timerDisplay = document.getElementById("timer");
+    if (!timerDisplay) {
+        timerDisplay = document.createElement("div");
+        timerDisplay.id = "timer";
+        timerDisplay.style.position = "absolute";
+        timerDisplay.style.top = "10px";
+        timerDisplay.style.right = "10px";
+        timerDisplay.style.fontSize = "20px";
+        timerDisplay.style.color = "red";
+        document.body.appendChild(timerDisplay);
+    }
+}
+
+
+pieces.forEach(piece =>{
+    addDragFunctionality(piece);
+});
+
+let timerInterval;
+
+function startTimer() {
+    let timeLeft = 10; // 10秒倒计时
+    timerInterval = setInterval(() => {
+        console.log(`Time left: ${timeLeft} seconds`);
+        timeLeft--;
+
+        if (timeLeft < 0) {
+            clearInterval(timerInterval);
+            endGame(); // 游戏结束
+        }
+    }, 1000);
+}
+
+function endGame() {
+    gameStarted = false;
+    pieces.forEach(piece => {
+        piece.style.pointerEvents = "none"; // 禁用所有图层的拖动功能
+    });
+    alert("Game Over!");
+}
+
+
+
 // Function to bring a piece to the front by setting a higher z-index
 function bringToFront(pieceId) {
     const piece = document.getElementById(pieceId);
     if (piece) {
+        if(previousPieceId && previousPieceId !==pieceId){
         maxZIndex += 1; // Increase maxZIndex to make this piece appear on top
         piece.style.zIndex = maxZIndex;
+        previousPieceId = pieceId; //record the current layer
+        }
     }
 }
 
@@ -47,6 +129,7 @@ function addDragFunctionality(piece) {
 
     // Mouse down event: Start dragging
     piece.addEventListener("mousedown", (e) => {
+        if(!gameStarted)return;//游戏未开始,则禁止拖动
         e.preventDefault(); // Prevent default behavior
 
         // Only start dragging if clicked on a non-transparent pixel
@@ -73,7 +156,7 @@ function addDragFunctionality(piece) {
 
     // Move the piece function
     const movePiece = (e) => {
-        if (isDragging) {
+        if (isDragging && gameStarted) {
             // Calculate the new position of the piece
             const x = e.clientX - offsetX;
             const y = e.clientY - offsetY;
