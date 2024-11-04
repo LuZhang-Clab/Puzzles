@@ -22,6 +22,17 @@
         <img class="puzzle-piece" id="piece7" src="Test_element/P-7.PNG" draggable="true" alt="P-7">
     </div>
 
+    <!-- Buttons to bring each piece to the front -->
+    <div id="button-container">
+        <button onclick="bringToFront('piece1')">Left eye</button>
+        <button onclick="bringToFront('piece2')">Mouth</button>
+        <button onclick="bringToFront('piece3')">Right eye</button>
+        <button onclick="bringToFront('piece4')">scarf</button>
+        <button onclick="bringToFront('piece5')">Eyebrow</button>
+        <button onclick="bringToFront('piece6')">Accessories</button>
+        <button onclick="bringToFront('piece7')">Hair</button>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>

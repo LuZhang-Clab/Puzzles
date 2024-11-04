@@ -1,29 +1,74 @@
 let socket = io();  // Connect to the server using Socket.IO, enabling real-time communication between the client and server
 
 const pieces = document.querySelectorAll(".puzzle-piece");  // Select all elements with the class "puzzle-piece" and store them in the 'pieces' variable
+let maxZIndex = 1000;  // Initialize maxZIndex to track the highest z-index used
+
+// Function to bring a piece to the front by setting a higher z-index
+function bringToFront(pieceId) {
+    const piece = document.getElementById(pieceId);
+    if (piece) {
+        maxZIndex += 1; // Increase maxZIndex to make this piece appear on top
+        piece.style.zIndex = maxZIndex;
+    }
+}
+
+// Function to check if clicked pixel is non-transparent
+function isNonTransparent(event, piece) {
+    // Create an offscreen canvas
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = piece.width;
+    canvas.height = piece.height;
+
+    // Draw the image onto the canvas
+    ctx.drawImage(piece, 0, 0, piece.width, piece.height);
+
+    // Calculate the click position relative to the image
+    const rect = piece.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // Define a margin of error for detecting nearby non-transparent pixels
+    const margin = 10;
+    for (let dx = -margin; dx <= margin; dx++) {
+        for (let dy = -margin; dy <= margin; dy++) {
+            const pixel = ctx.getImageData(x + dx, y + dy, 1, 1).data;
+            if (pixel[3] > 0) return true;
+        }
+    }
+
+    return false;
+}
 
 
-function addDragFunctionality(piece){
+function addDragFunctionality(piece) {
     let isDragging = false; // To track if the piece is currently being dragged
     let offsetX, offsetY; // To store the offset of the mouse position relative to the piece
 
     // Mouse down event: Start dragging
     piece.addEventListener("mousedown", (e) => {
         e.preventDefault(); // Prevent default behavior
-        isDragging = true;
 
-        // Calculate the offset of the mouse position relative to the piece
-        offsetX = e.clientX - piece.getBoundingClientRect().left;
-        offsetY = e.clientY - piece.getBoundingClientRect().top;
+        // Only start dragging if clicked on a non-transparent pixel
+        if (isNonTransparent(e, piece)) {
+            isDragging = true;
 
-        // Set cursor to indicate dragging
-        piece.style.cursor = 'grabbing';
+            // Calculate the offset of the mouse position relative to the piece
+            offsetX = e.clientX - piece.getBoundingClientRect().left;
+            offsetY = e.clientY - piece.getBoundingClientRect().top;
 
-        // Bring the piece to the front
-        piece.style.zIndex = 1000;
+            // Set cursor to indicate dragging
+            piece.style.cursor = 'grabbing';
 
-        // Add a mousemove event listener to the document
-        document.addEventListener("mousemove", movePiece);
+            // Bring the piece to the front
+            //piece.style.zIndex = 1000;
+
+            // Bring the piece to the front when it starts dragging
+            bringToFront(piece.id);
+
+            // Add a mousemove event listener to the document
+            document.addEventListener("mousemove", movePiece);
+        }
     });
 
     // Move the piece function
@@ -33,11 +78,14 @@ function addDragFunctionality(piece){
             const x = e.clientX - offsetX;
             const y = e.clientY - offsetY;
 
+            // Log the position to the console
+            console.log(`Piece ID: ${piece.id}, New Position: (${x}, ${y})`);
+
             // Set the piece's position to the new coordinates
             piece.style.position = "absolute";
             piece.style.left = `${x}px`;
             piece.style.top = `${y}px`;
-            socket.emit("move-piece", { id: piece.id, x, y});
+            socket.emit("move-piece", { id: piece.id, x, y });
         }
     };
 
@@ -81,23 +129,23 @@ function setup() {
         piece.style.left = `${randomX}px`;
         piece.style.top = `${randomY}px`;
 
-        positions.push({ id: piece.id, x: randomX, y: randomY});
+        positions.push({ id: piece.id, x: randomX, y: randomY });
     });
-    socket.emit('initialize-pieces',positions);
+    socket.emit('initialize-pieces', positions);
 }
 
 //Only run setup if it is the first load
-if (!sessionStorage.getItem('hasLoaded')){
+if (!sessionStorage.getItem('hasLoaded')) {
     setup();
-    sessionStorage.setItem('hasLoaded','true');
+    sessionStorage.setItem('hasLoaded', 'true');
 }
 
-socket.on('initialize-pieces', (positions)=>{
-    for (let id in positions){
-        const piece =document.getElementById(id);
-        if(piece){
-            piece.style.position = "absolute"; 
-            piece.style.left = `${positions[id].x}px`; 
+socket.on('initialize-pieces', (positions) => {
+    for (let id in positions) {
+        const piece = document.getElementById(id);
+        if (piece) {
+            piece.style.position = "absolute";
+            piece.style.left = `${positions[id].x}px`;
             piece.style.top = `${positions[id].y}px`;
         }
     }
