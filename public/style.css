@@ -14,15 +14,58 @@ body {
 
 }
 
-#button-container {
-margin: 5px;
-
+/* Overlay styling to center button and add background dim */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
 }
-.Button_not{
-    padding:10px;
-    display: block; /* 确保整个按钮区域可点击 */
+
+/* Button styling */
+.Button_not {
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    /* Button color */
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
 }
+
+/* Button hover effect */
+.Button_not:hover {
+    background-color: #0056b3;
+}
+
+/* Hidden class to hide the overlay */
+.hidden {
+    display: none;
+}
+
+
+
+#button-container {
+    margin: 5px;
+
+}
+
+.Buttons {
+    padding: 10px;
+    display: block;/* 确保整个按钮区域可点击 */
+    cursor: pointer;
+}
+
+
 
 .puzzle-piece {
     width: 297.22px;
@@ -34,11 +77,12 @@ margin: 5px;
 
 /* Darken the image slightly on hover */
 .puzzle-piece:hover {
-    filter: brightness(0.6); /* Reduce brightness to make the image appear darker */
+    filter: brightness(0.6);
+    /* Reduce brightness to make the image appear darker */
 }
 
 
-#P-bg {
+/*#P-bg {
     height: 396.28px;
     width: 297.22px;
     position: absolute;
@@ -47,4 +91,4 @@ margin: 5px;
     transform: translate(-50%, -50%);
     border: 1px solid black;
     z-index: -1;
-}
+}*/

@@ -12,6 +12,7 @@ function startGame() {
     // gameStarted =true;
     document.getElementById('gameStartButton').disabled = true;//让gamestart按钮失效
     // startTimer();//计时器功能开启
+    document.getElementById('overlay').classList.add('hidden');
 
 }
 

@@ -12,6 +12,11 @@
 
     <!-- <image id="P-bg" src="Test_element/P-bg.PNG" >-->
 
+        <div class="overlay" id="overlay">
+            <button class="Button_not" id="gameStartButton" onclick="startGame()">Game Start</button>
+        </div>
+        
+
 
 
     <div id="puzzle-container">
@@ -28,16 +33,20 @@
 
     <!-- Buttons to bring each piece to the front -->
     <div id="button-container">
-        <button class="Button_not" onclick="bringToFront('piece1')">Left eye</button>
-        <button class="Button_not" onclick="bringToFront('piece2')">Mouth</button>
-        <button class="Button_not" onclick="bringToFront('piece3')">Right eye</button>
-        <button class="Button_not" onclick="bringToFront('piece4')">scarf</button>
-        <button class="Button_not" onclick="bringToFront('piece5')">Eyebrow</button>
-        <button class="Button_not" onclick="bringToFront('piece6')">Accessories</button>
-        <button class="Button_not" onclick="bringToFront('piece7')">Hair</button>
-        <button class="Button_not" id="gameStartButton" onclick="startGame()">Game Start</button>
+        <button class="Buttons" onclick="bringToFront('piece1')">Left eye</button>
+        <button class="Buttons" onclick="bringToFront('piece2')">Mouth</button>
+        <button class="Buttons" onclick="bringToFront('piece3')">Right eye</button>
+        <button class="Buttons" onclick="bringToFront('piece4')">scarf</button>
+        <button class="Buttons" onclick="bringToFront('piece5')">Eyebrow</button>
+        <button class="Buttons" onclick="bringToFront('piece6')">Accessories</button>
+        <button class="Buttons" onclick="bringToFront('piece7')">Hair</button>
+       <!-- <button class="Button_not" id="gameStartButton" onclick="startGame()">Game Start</button> -->
 
     </div>
+
+    <!--<div>
+        <button class="Button_not" id="gameStartButton" onclick="startGame()">Game Start</button>
+    </div>-->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
