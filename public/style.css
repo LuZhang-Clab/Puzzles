@@ -15,8 +15,13 @@ body {
 }
 
 #button-container {
-margin: 10px;
+margin: 5px;
 
+}
+.Button_not{
+    padding:10px;
+    display: block; /* 确保整个按钮区域可点击 */
+    cursor: pointer;
 }
 
 .puzzle-piece {
