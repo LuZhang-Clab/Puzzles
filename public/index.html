@@ -1,42 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puzzles</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    
-    <image id="P-bg" src="Test_element/P-bg.PNG" >
 
-   
-       
-    <div id="puzzle-container">
-        <img class="puzzle-piece" id="piece1" src="Test_element/P-1.PNG" draggable="true" alt="P-1">
-        <img class="puzzle-piece" id="piece2" src="Test_element/P-2.PNG" draggable="true" alt="P-2">
-        <img class="puzzle-piece" id="piece3" src="Test_element/P-3.PNG" draggable="true" alt="P-3">
-        <img class="puzzle-piece" id="piece4" src="Test_element/P-4.PNG" draggable="true" alt="P-4">
-        <img class="puzzle-piece" id="piece5" src="Test_element/P-5.PNG" draggable="true" alt="P-5">
-        <img class="puzzle-piece" id="piece6" src="Test_element/P-6.PNG" draggable="true" alt="P-6">
-        <img class="puzzle-piece" id="piece7" src="Test_element/P-7.PNG" draggable="true" alt="P-7">
-    </div>
+    <!-- <image id="P-bg" src="Test_element/P-bg.PNG" >-->
 
-    <!-- Buttons to bring each piece to the front -->
-    <div id="button-container">
-        <button class="Button_not" onclick="bringToFront('piece1')">Left eye</button>
-        <button class="Button_not" onclick="bringToFront('piece2')">Mouth</button>
-        <button class="Button_not" onclick="bringToFront('piece3')">Right eye</button>
-        <button class="Button_not" onclick="bringToFront('piece4')">scarf</button>
-        <button class="Button_not" onclick="bringToFront('piece5')">Eyebrow</button>
-        <button class="Button_not" onclick="bringToFront('piece6')">Accessories</button>
-        <button class="Button_not" onclick="bringToFront('piece7')">Hair</button>
+    <div class="overlay" id="overlay">
         <button class="Button_not" id="gameStartButton" onclick="startGame()">Game Start</button>
-    
+        <h1>Portrait Puzzel: Collaborate to create a portrait for Princess Jasmine!</h1>
+        <h3>Please hit the "Game Start" button together to avoid losing your chance!</h3>
     </div>
+
+
+    <div id="main-container">
+        <div id="puzzle-container">
+            <img class="puzzle-piece" id="piece1" src="Test_element/P-1.PNG" draggable="true" alt="P-1">
+            <img class="puzzle-piece" id="piece2" src="Test_element/P-2.PNG" draggable="true" alt="P-2">
+            <img class="puzzle-piece" id="piece3" src="Test_element/P-3.PNG" draggable="true" alt="P-3">
+            <img class="puzzle-piece" id="piece4" src="Test_element/P-4.PNG" draggable="true" alt="P-4">
+            <img class="puzzle-piece" id="piece5" src="Test_element/P-5.PNG" draggable="true" alt="P-5">
+            <img class="puzzle-piece" id="piece6" src="Test_element/P-6.PNG" draggable="true" alt="P-6">
+            <img class="puzzle-piece" id="piece7" src="Test_element/P-7.PNG" draggable="true" alt="P-7">
+            <img class="puzzle-piece" id="piece8" src="Test_element/P-bg.PNG" draggable="true" alt="P-8">
+
+        </div>
+
+        <!-- Buttons to bring each piece to the front -->
+        <div id="button-container">
+            <h3>Click here to bring pieces to the front.</h3>
+            <button class="Buttons" onclick="bringToFront('piece1')">Left eye</button>
+            <button class="Buttons" onclick="bringToFront('piece2')">Mouth</button>
+            <button class="Buttons" onclick="bringToFront('piece3')">Right eye</button>
+            <button class="Buttons" onclick="bringToFront('piece4')">scarf</button>
+            <button class="Buttons" onclick="bringToFront('piece5')">Eyebrow</button>
+            <button class="Buttons" onclick="bringToFront('piece6')">Accessories</button>
+            <button class="Buttons" onclick="bringToFront('piece7')">Hair</button>
+        <!-- <button class="Button_not" id="gameStartButton" onclick="startGame()">Game Start</button> -->
+
+        </div>
+    </div>
+
+    <!--<div>
+        <button class="Button_not" id="gameStartButton" onclick="startGame()">Game Start</button>
+    </div>-->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
 </body>
+
 </html>
