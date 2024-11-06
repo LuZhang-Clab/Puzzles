@@ -58,6 +58,7 @@ socket.on("start-game", () => {
         io.emit('move-piece',data);
         
 
+
     // ---------old version-------
     // // Listen for 'move-piece' events from the client
     // socket.on("move-piece", (data) => {  // When a "move-piece" event is received from the client, handle it
@@ -67,7 +68,7 @@ socket.on("start-game", () => {
 
 
     let gameStarted = false;
-let timer = 10; // 初始计时设为 10 秒
+let timer = 15; // 初始计时设为 15 秒
 
 // 处理客户端的 'start-game' 请求
 // io.on("connection", (socket) => {
@@ -89,7 +90,7 @@ function startTimer() {
         if (timer <= 0) {
             clearInterval(interval);
             gameStarted = false;
-            timer = 10; // 重置计时器
+            timer = 15; // 重置计时器
             io.emit("game-ended"); // 广播游戏结束
         }
     }, 1000);

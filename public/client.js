@@ -70,7 +70,7 @@ function startTimerUI() {
 let timerInterval;
 
 function startTimer() {
-    let timeLeft = 10; // 10秒倒计时
+    let timeLeft = 15; // 15秒倒计时
     timerInterval = setInterval(() => {
         console.log(`Time left: ${timeLeft} seconds`);
         timeLeft--;
@@ -220,7 +220,7 @@ function setup() {
     const positions = [];
     pieces.forEach(piece => {
         // Get the width and height of the browser window
-        const windowWidth = window.innerWidth;
+        const windowWidth = window.innerWidth-150;
         const windowHeight = window.innerHeight;
 
         // Generate random x and y coordinates ensuring pieces stay within the screen
